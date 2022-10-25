@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Перевод</title>
+</head>
+<body>
+    <form method="post">
+        <label>Перевод чисел:</label>
+        <div class="row">
+            <div class="col">
+              <input type="number" name="number" placeholder="Число">
+            </div>
+            <div class="col">
+              <input type="number" name="oldsystem" placeholder="Исходная система счисления">
+            </div>
+            <div class="col">
+              <input type="number" name="newsystem" placeholder="Новая система счисления">
+            </div>
+        </div>
+        <br>
+        <button type="submit">Перевести</button>
+    </form>
+    <br>
+    {% if number%}
+        <p>{{number}} (в {{oldSystem}} С.С.) в {{newSystem}} С.С = {{answer}}</p>
+    {% endif %}
+</body>
+</html>
