@@ -1,31 +1,44 @@
-from flask import *
-
-app = Flask(__name__)
+from flask import Flask, request, render_template
 
 
-def Count(num, fromSys, intoSys):
+def toweb(f):
+    app = Flask(__name__)
+
+    @app.route("/", methods=['GET', 'POST'])
+    def first_page():
+        a = f.__annotations__
+        if 'return' in a:
+            a.pop('return')
+
+        if request.form:
+            res = f(**request.form)
+        else:
+            res = None
+        titles = {'num': 'Число', 'fromSys': 'Исходная С. С.', 'intoSys': 'Новая С. С.'}
+        return render_template('first_page.html', about="Замена системы счисления", a=a, res=res, titles=titles)
+
+    return app
+
+
+def maxNum(num):
+    mx = 0
+    for el in num:
+        mx = max(mx, int(el))
+    return mx
+
+
+@toweb
+def s(num: str, fromSys: str, intoSys: str) -> int:
+    fromSys, intoSys = int(fromSys), int(intoSys)
+    if fromSys > 16 or intoSys > 16 or maxNum(num) >= fromSys:
+        return "некорректные входные данные!"
     num = int(num, fromSys)
     res = ''
     s = '01234567889ABCDEF'
     while num > 0:
         res = s[num % intoSys] + res
         num //= intoSys
-    return res[::-1]
+    return res
 
 
-@app.route('/', methods=['GET', 'POST'])
-def first_page():
-    answer = ""
-    resp = make_response(render_template("first_page.html"))
-    if request.method == 'POST':
-        num = request.form.get('number')
-        fromSys = request.form.get('oldsystem')
-        intoSys = request.form.get('newsystem')
-        if num != '' and fromSys != '' and intoSys != '':
-            answer = Count(num, int(fromSys), int(intoSys))
-            print(num)
-        return render_template("first_page.html", number=num, oldSystem=fromSys, newSystem=intoSys, answer=answer)
-    return render_template("first_page.html")
-
-if __name__ == '__main__':
-    app.run(debug=True)
+s.run(host='0.0.0.0', port="5001")
